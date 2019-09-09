@@ -137,35 +137,16 @@ id=reshape(id,Nl,5);
 %% simulations
 
 N_sim=500;
-theta_hat=zeros(6,N_sim);
-theta_trim_hat=zeros(6,N_sim);
 
-theta_tilde=zeros(1,N_sim);
-
-%% for mean treated counterfactual outcome
-% parfor n=1:N_sim
-%     [n/N_sim]
-%     [y,d,z,x]=sim_rr(fy,fd,px,N,n);
-%     [theta_hat(:,n),~,~]=dml_rr(d.*y,d,z,x,p_zx,b_zx,m_y,m_d,psi,obj,L,id,idn,options); %d*y for treated cntr; (d-1) for untreated cntr
-% 
-%     theta_tilde(n) = naive_kappa(d.*y,d,z,x,p_x,b_x,options);%manual kappa reweighting
-% end
-%%
-% theta_hat = [theta_hat; theta_tilde]; %concatenate
-% fid = fopen(strcat(filename,'.csv'),'wt');
-% fprintf(fid,'%s,%s,%s,%s,%s,%s,%s\n','delta_rrr','pi_rrr','delta_reg','pi_reg','delta_ps','pi_ps','beta_kappa');
-% fclose(fid);
-% dlmwrite(strcat(filename,'.csv'), theta_hat','delimiter',',');
-% 
 %% for counterfaction distribution
 grid1 = [-1,0,1,2,3,4];
 grid0 = [-2,-1,0,1,2,3];
 theta1_rrr=zeros(N_sim,length(grid1));
 theta0_rrr=zeros(N_sim,length(grid0));
-theta1_rrr_trim1=zeros(N_sim,length(grid1));
-theta0_rrr_trim1=zeros(N_sim,length(grid0));
-theta1_rrr_trim2=zeros(N_sim,length(grid1));
-theta0_rrr_trim2=zeros(N_sim,length(grid0));
+theta1_plugin_trim1=zeros(N_sim,length(grid1));
+theta0_plugin_trim1=zeros(N_sim,length(grid0));
+theta1_plugin_trim2=zeros(N_sim,length(grid1));
+theta0_plugin_trim2=zeros(N_sim,length(grid0));
 
 theta1_naive_kappa=zeros(N_sim,length(grid1));
 theta0_naive_kappa=zeros(N_sim,length(grid0));
@@ -188,8 +169,8 @@ for n=1:N_sim
      
 % DML-plugin with different trimming set (need to change get_alpha
 % function to use the plugin approach)
-%     [theta1_rrr_trim1(n,:),theta0_rrr_trim1(n,:),~,~,~,...
-%       theta1_rrr_trim2(n,:),theta0_rrr_trim2(n,:),~,~,~] = cntr_dist_dml_rr_trim(grid1,grid0,y,d,z,x,p_zx,b_zx,m_y,m_d,L,id,idn,options);
+%     [theta1_plugin_trim1(n,:),theta0_plugin_trim1(n,:),~,~,~,...
+%       theta1_plugin_trim2(n,:),theta0_plugin_trim2(n,:),~,~,~] = cntr_dist_dml_rr_trim(grid1,grid0,y,d,z,x,p_zx,b_zx,m_y,m_d,L,id,idn,options);
 end
 %%
 % filename = 'dr_plugin_2_1_005095x_cntr1_dist_logit_trim';
@@ -197,7 +178,7 @@ filename = 'naive_kappa_2_1_005095x_cntr1_dist_logit_trim';
 theta1_hat = theta1_naive_kappa;
 % theta1_hat = [theta1_rrr, theta1_naive_kappa]; %concatenate
 % theta1_hat = theta1_rrr;
-% theta1_hat = [theta1_rrr_trim1, theta1_rrr_trim2]; %concatenate
+% theta1_hat = [theta1_plugin_trim1, theta1_plugin_trim2]; %concatenate
 
 dlmwrite(strcat(filename,'.csv'), theta1_hat,'-append','delimiter',',');
 
@@ -206,7 +187,7 @@ filename = 'naive_kappa_2_1_005095x_cntr0_dist_logit_trim';
 theta0_hat = theta0_naive_kappa;
 % theta0_hat = [theta0_rrr, theta0_naive_kappa]; %concatenate
 % theta0_hat = theta0_rrr;
-% theta0_hat = [theta0_rrr_trim1, theta0_rrr_trim2]; %concatenate
+% theta0_hat = [theta0_plugin_trim1, theta0_plugin_trim2]; %concatenate
 
 dlmwrite(strcat(filename,'.csv'), theta0_hat,'-append','delimiter',',');
 
