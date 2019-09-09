@@ -11,7 +11,3 @@ Belloni, A., Chernozhukov, V., Fernández?Val, I., and Hansen, C. (2017). Program
 We then apply DML-RRR algorithm to learn compliers' counterfactual outcome distribution using the relevant section in `master.m`.
 
 ## Authors and acknowledgment
-
-
-## License
-[MIT](https://choosealicense.com/licenses/mit/)
