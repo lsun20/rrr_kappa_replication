@@ -4,7 +4,7 @@ rrr_kappa is a Matlab library for compliers DML.
 
 
 ## Usage
-
+For the simulations, execute and follow in-line instructions in
 ```
 master.m
 ```
