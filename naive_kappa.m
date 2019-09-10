@@ -60,11 +60,11 @@ denom_tilde = d.*alpha_hat;
 % 
 % end
 %%
-% theta_tilde=mean(num_tilde)/mean(denom_tilde);
+theta_tilde=mean(num_tilde)/mean(denom_tilde);
 
 %create an index for trimming
-keep = (pi_hat <= 0.9 & pi_hat >= 0.1 );
-theta_tilde = mean(num_tilde(keep))/mean(denom_tilde(keep));
+% keep = (pi_hat <= 0.9 & pi_hat >= 0.1 );
+% theta_tilde = mean(num_tilde(keep))/mean(denom_tilde(keep));
 
 end
 

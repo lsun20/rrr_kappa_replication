@@ -27,7 +27,7 @@ p_zx=2 * (4 + 1);
 b_x = @(x) [ones(length(x),1); x; x.^2; x.^3; x.^4];
 p_x = 5; %dim of dict
 
-%dict for 401(k) example
+%dict for 401(k) example of Belloni et al (2017)
 % b_zx=@(z,x) [1; x'; z; x'.*z];
 % p_zx=2 * (size(x,2) + 1);
 % b_x = @(x) [1; x'];
@@ -65,7 +65,7 @@ id=nonzeros(id);
 %id=vec2mat(id,200)';
 id=reshape(id,Nl,5);
 %% 401(k) example
-% 
+% grid1 = pt; grid0 = pt; % pt is grid defined in the 401(k) example of Belloni et al (2017)
 % [theta1_hat,theta0_hat,j_hat,omega1_hat, omega0_hat] = cntr_dist_dml_rr(grid1,grid0,y,d,z,x,p_zx,b_zx,m_y,m_d,L,id,idn,options);
 % %% joint confidence band
 % mu = zeros(length(grid1),1);
@@ -174,7 +174,6 @@ for n=1:N_sim
 end
 %%
 % filename = 'dr_plugin_2_1_005095x_cntr1_dist_logit_trim';
-filename = 'naive_kappa_2_1_005095x_cntr1_dist_logit_trim';
 theta1_hat = theta1_naive_kappa;
 % theta1_hat = [theta1_rrr, theta1_naive_kappa]; %concatenate
 % theta1_hat = theta1_rrr;
@@ -183,7 +182,6 @@ theta1_hat = theta1_naive_kappa;
 dlmwrite(strcat(filename,'.csv'), theta1_hat,'-append','delimiter',',');
 
 % filename = 'dr_plugin_2_1_005095x_cntr0_dist_logit_trim';
-filename = 'naive_kappa_2_1_005095x_cntr0_dist_logit_trim';
 theta0_hat = theta0_naive_kappa;
 % theta0_hat = [theta0_rrr, theta0_naive_kappa]; %concatenate
 % theta0_hat = theta0_rrr;
