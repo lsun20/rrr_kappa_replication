@@ -20,7 +20,6 @@ library("gglasso")
 library("plotrix")
 library("gridExtra")
 
-# setwd("~/Desktop/research/rrr_lasso_401k")
 # loop the simulations
 
 #######################
@@ -98,7 +97,7 @@ source('stage1_kappa.R')
 N_sim <- 500; N <- 1000; # simulation spec
 source('specifications_sim.R')
 data<-get_sim_data(N,1) # get one draw of data to set up parameter values
-  #SS: need to directly edit the script 'specifications_sim.R' to supplement grid; first column of Y is participation
+  #need to directly edit the script 'specifications_sim.R' to supplement grid; first column of Y is participation
 T=data[[2]] #eligibility
 X=data[[3]] #no intercept
 perc=data[[4]] #grid pts

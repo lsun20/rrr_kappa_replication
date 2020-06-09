@@ -8,9 +8,9 @@ rrr<-function(Y,T,X,p0,D_LB,D_add,max_iter,b,alpha_estimator,gamma_estimator){
   # theta=rep(0,L)
   # v_sq=rep(0,L)
   
-  d = ncol(Y) #SS: Y is a matrix [D,etc]
-  theta = matrix(0,L,d) #SS: might not need this after all...
-  moments_full = matrix(0,0,d) #SS: store the Psi's for each obs
+  d = ncol(Y) #  Y is a matrix [D,etc]
+  theta = matrix(0,L,d) #  might not need this after all...
+  moments_full = matrix(0,0,d) #  store the Psi's for each obs
   for (l in 1:L){
     
     Y.l=Y[folds[[l]],]
@@ -24,7 +24,7 @@ rrr<-function(Y,T,X,p0,D_LB,D_add,max_iter,b,alpha_estimator,gamma_estimator){
     
     n.l=length(T.l)
     n.nl=length(T.nl)
-    moments = matrix(0,n.l,d) #SS: store the Psi's for each fold
+    moments = matrix(0,n.l,d) #  store the Psi's for each fold
     
     # get stage 1 (on nl)
     stage1_estimators<-get_stage1(Y.nl,T.nl,X.nl,p0,D_LB,D_add,max_iter,b,alpha_estimator,gamma_estimator)
@@ -54,8 +54,8 @@ rrr<-function(Y,T,X,p0,D_LB,D_add,max_iter,b,alpha_estimator,gamma_estimator){
     }
     moments_full = rbind(moments_full, moments)
   }
-  #SS: denominator is the first stage, corr to first col of Y
-  #SS: numerator is the reduced form, corr to the rest col of Y
+  #  denominator is the first stage, corr to first col of Y
+  #  numerator is the reduced form, corr to the rest col of Y
   j_hat <- mean(moments_full[,1])
   theta_hat <- colMeans(moments_full[,2:d])/j_hat
   psi_hat <- moments_full[,2:d] - moments_full[,1] %*% t(theta_hat)

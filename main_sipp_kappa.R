@@ -37,7 +37,7 @@ quintile=0 #quintile in (1-5). 0 means all quintiles
 df  <- read.dta("sipp1991.dta")
 spec=3 #spec in (1-3)
 data<-get_data(df,spec,quintile) #trimming like Farrell; different than Chernozhukov et al. 
-# SS: need to directly edit the script 'specifications_kappa.R' to supplement grid; first column of Y is participation
+#  need to directly edit the script 'specifications_kappa.R' to supplement grid; first column of Y is participation
 
 Y=data[[1]]
 T=data[[2]] #eligibility
@@ -92,7 +92,7 @@ crit <- quantile(R_max,0.95)
 theta_l <- theta_hat - c * theta_hat_var^0.5
 theta_u <- theta_hat + c * theta_hat_var^0.5
 
-# printer(results) #SS: haven't updated these to show vectors
+# printer(results) # haven't updated these to show vectors
 # for_tex(results)
 out <- cbind( perc, theta_hat, theta_l, theta_u)
 dir <- './results/sipp_cntr_191116/'
