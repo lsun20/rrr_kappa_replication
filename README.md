@@ -14,4 +14,5 @@ We then apply Auto-DML algorithm to learn compliers' counterfactual outcome dist
 
 ## Authors and acknowledgment
 Rahul Singh, Liyang Sun
+
 Paper available on [arXiv](https://arxiv.org/abs/1909.05244).
