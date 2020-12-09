@@ -13,3 +13,5 @@ Belloni, A., Chernozhukov, V., Fernández-Val, I., and Hansen, C. (2017). Program
 We then apply Auto-DML algorithm to learn compliers' counterfactual outcome distribution using the relevant section in `main_sipp_kappa.R`.
 
 ## Authors and acknowledgment
+Rahul Singh, Liyang Sun
+Paper available on [arXiv](https://arxiv.org/abs/1909.05244).
