@@ -26,12 +26,7 @@ b_zx=@(z,x) [ones(length(x),1); x; x.^2; x.^3; x.^4;...
 p_zx=2 * (4 + 1);
 b_x = @(x) [ones(length(x),1); x; x.^2; x.^3; x.^4];
 p_x = 5; %dim of dict
-
-%dict for 401(k) example of Belloni et al (2017)
-% b_zx=@(z,x) [1; x'; z; x'.*z];
-% p_zx=2 * (size(x,2) + 1);
-% b_x = @(x) [1; x'];
-% p_x = size(x,2) + 1;
+ 
 %functional
 m_y=@(x,gamma_y) gamma_y(1,x)-gamma_y(0,x);
 m_d=@(x,gamma_d) gamma_d(1,x)-gamma_d(0,x);
@@ -64,75 +59,6 @@ id=id.*(1:N)';
 id=nonzeros(id);
 %id=vec2mat(id,200)';
 id=reshape(id,Nl,5);
-%% 401(k) example
-% grid1 = pt; grid0 = pt; % pt is grid defined in the 401(k) example of Belloni et al (2017)
-% [theta1_hat,theta0_hat,j_hat,omega1_hat, omega0_hat] = cntr_dist_dml_rr(grid1,grid0,y,d,z,x,p_zx,b_zx,m_y,m_d,L,id,idn,options);
-% %% joint confidence band
-% mu = zeros(length(grid1),1);
-% % sigma = eye(length(grid));
-% V = j_hat^-1 * omega1_hat*j_hat^-1; theta1_hat_var = diag(V)/N;
-% sigma = diag(diag(V))^-0.5 * V * diag(diag(V))^-0.5;
-% rng('default')  % For reproducibility
-% R = mvnrnd(mu,sigma,10000);
-% R_max = max(abs(R),[],2); % take row-wise max
-% c1 = quantile(R_max, 0.95);
-% %%
-% mu = zeros(length(grid0),1);
-% V = j_hat^-1 * omega0_hat*j_hat^-1; theta0_hat_var = diag(V)/N;
-% sigma = diag(diag(V))^-0.5 * V * diag(diag(V))^-0.5;
-% rng('default')  % For reproducibility
-% R = mvnrnd(mu,sigma,10000);
-% R_max = max(R,[],2); % take row-wise max
-% c0 = quantile(R_max, 0.95);
-% 
-% %% plot simultaneous confidence band
-% theta1_l = theta1_hat - c1 * theta1_hat_var.^(0.5); 
-% theta1_u = theta1_hat + c1 * theta1_hat_var.^(0.5); 
-% 
-% theta0_l = theta0_hat - c0 * theta0_hat_var.^(0.5); 
-% theta0_u = theta0_hat + c0 * theta0_hat_var.^(0.5); 
-% 
-% filename = 'ExampleNetTFA_rrr_kappa_cntr_dist_spec4';
-% fig = figure('Name',strcat(filename,' CB'))
-% hold on;
-% 
-% for idx=1:length(grid1)
-%     plot([grid1(idx) grid1(idx)], [theta1_l(idx) theta1_u(idx)],'-k.');
-% end
-% hold on
-% h1=scatter(grid1,theta1_hat,40,'x');
-% 
-% hold on
-% 
-% for idx=1:length(grid0)
-%     plot([grid0(idx) grid0(idx)], [theta0_l(idx) theta0_u(idx)],'-k.');
-% end
-% hold on
-% h2=scatter(grid0,theta0_hat,40,'*');
-% hold on
-% ax = gca;
-% ax.FontSize = 15;
-% xlabel('net financial assets','FontSize',15);
-% % ylabel('CDF of counterfactual outcomes');
-% legend1 = 'Estimated CDF of Y^{(1)}';
-% legend2 = 'Estimated CDF of Y^{(0)}';
-% legend([h1,h2],{legend1, legend2},'Location','southeast','FontSize',15);
-% %%
-% dir = './simulation results/';
-% figurename = strcat(dir, filename, '_CB','.eps');
-% set(fig,'Units','Inches');
-% pos = get(fig,'Position');
-% set(fig,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-% print(fig,figurename,'-depsc','-r0')
-% filename = strcat(dir, filename, '_CB','.csv');
-% %%
-% CB = [grid1' theta1_hat theta1_l theta1_u grid0' theta0_hat theta0_l theta0_u]; %concatenate
-% dlmwrite(filename, CB,'delimiter',',');
-% 
-% %%
-% CB = csvread('./simulation results/ExampleNetTFA_rrr_kappa_cntr_dist_spec4_CB.csv');
-% grid1 = CB(:,1); theta1_hat = CB(:,2);  theta1_l = CB(:,3); theta1_u =  CB(:,4); 
-% grid0 = CB(:,5); theta0_hat = CB(:,6); theta0_l =  CB(:,7); theta0_u =  CB(:,8);
 
 %% simulations
 
