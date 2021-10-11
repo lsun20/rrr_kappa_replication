@@ -1,8 +1,8 @@
 get_data<-function(df,spec,quintile){
   outcome <- df[,"net_tfa"]
   takeup <- df[,"p401"]
-  Y <- cbind(outcome, takeup) # for LATE just need Y and participation
-  # create a grid
+  Y <- cbind(outcome, takeup) #SS: for LATE just need Y and participation
+  #SS: create a grid
   tausAll <- seq(5,95,1)
   pt <- quantile(outcome, tausAll/100)
   perc <- unique(pt)
@@ -11,7 +11,7 @@ get_data<-function(df,spec,quintile){
   # taus <- 0 # if not using a grid, set to sth so it goes through
   Y <- takeup 
   for (i in 1:length(perc)) {
-    # create n x d matrix
+    #SS: create n x d matrix
     # Y_entry <- ( outcome <= perc[i] )*takeup #grid for treated ctnr outcome grid (D, D*1{Y<=y})
     Y_entry <- ( outcome <= perc[i] )*(takeup-1) #grid for untreated ctnr outcome grid (D, (D-1)*1{Y<=y})
     Y <- cbind(Y,Y_entry)

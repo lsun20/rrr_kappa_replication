@@ -19,7 +19,7 @@ library("nnet")	#quicker multinomial logit
 library("gglasso")
 library("plotrix")
 library("gridExtra")
-
+library("randomForest")
 # setwd("~/Desktop/research/rrr_lasso_401k")
 
 #######################
@@ -28,16 +28,16 @@ library("gridExtra")
 
 # source('specifications.R')
 # for (quintile in 1:5){
-source('specifications_kappa.R')
+source('../specifications_kappa.R')
 quintile=0 #quintile in (1-5). 0 means all quintiles
 
   print(paste0('quintile: '))
   print(paste0(quintile))
   
-df  <- read.dta("sipp1991.dta")
+df  <- read.dta("../sipp1991.dta")
 spec=3 #spec in (1-3)
 data<-get_data(df,spec,quintile) #trimming like Farrell; different than Chernozhukov et al. 
-#  need to directly edit the script 'specifications_kappa.R' to supplement grid; first column of Y is participation
+# SS: need to directly edit the script 'specifications_kappa.R' to supplement grid; first column of Y is participation
 
 Y=data[[1]]
 T=data[[2]] #eligibility
@@ -48,7 +48,7 @@ perc=data[[4]] #grid pts
 # helper functions
 ##################
 
-source('primitives.R')
+source('../primitives.R')
 source('stage1_kappa.R')
 
 # dictionary
@@ -66,15 +66,20 @@ D_LB=0 #each diagonal entry of \hat{D} lower bounded by D_LB
 D_add=.2 #each diagonal entry of \hat{D} increased by D_add. 0.1 for 0, 0,.2 otw
 max_iter=10 #max number iterations in Dantzig selector iteration over estimation and weights
 
+alpha_estimator=1
+gamma_estimator=1
+
+#alpha_estimator: 0 dantzig, 1 lasso
+#gamma_estimator: 0 dantzig, 1 lasso, 2 rf, 3 nn
+
 ###########
 # algorithm
 ###########
 
 set.seed(1) # for sample splitting
-lasso=1 #else dantzig
 
 source('stage2_kappa.R')
-results<-rrr(Y,T,X,p0,D_LB,D_add,max_iter,dict,lasso) 
+results<-rrr(Y,T,X,p0,D_LB,D_add,max_iter,dict,alpha_estimator,gamma_estimator) 
 
 theta_hat <- results[[1]]
 j_hat <- results[[2]]
@@ -85,17 +90,17 @@ omega_hat <- results[[3]]
 n <- nrow(X)
 V <- j_hat^-1 *omega_hat * j_hat^-1
 theta_hat_var = diag(V)/n
-sigma <- diag(1/diag(V)^-0.5 ) %*% V %*% diag(1/diag(V)^-0.5 )
-R <- mvrnorm(10000, rep(0,length(theta_hat)), sigma)
-R_max <- apply(R, 1,FUN=min) # take row-wise max
+sigma <- diag(diag(V)^-0.5 ) %*% V %*% diag(diag(V)^-0.5 )
+R <- abs(mvrnorm(10000, rep(0,length(theta_hat)), sigma))
+R_max <- apply(R, 1,FUN=max) # take row-wise max
 crit <- quantile(R_max,0.95)
-theta_l <- theta_hat - c * theta_hat_var^0.5
-theta_u <- theta_hat + c * theta_hat_var^0.5
+theta_l <- theta_hat - crit * theta_hat_var^0.5
+theta_u <- theta_hat + crit * theta_hat_var^0.5
 
-# printer(results) # haven't updated these to show vectors
+# printer(results) #SS: haven't updated these to show vectors
 # for_tex(results)
 out <- cbind( perc, theta_hat, theta_l, theta_u)
-dir <- './results/sipp_cntr_191116/'
+dir <- '../results/sipp_cntr_210923/'
 spec <- 'untreated'
 filename <- paste(dir,spec,'_CB','.csv',sep = "")
 write.csv(out, filename,row.names = FALSE)

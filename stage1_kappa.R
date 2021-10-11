@@ -98,7 +98,7 @@ RMD_stable<-function(Y,T,X,p0,D_LB,D_add,max_iter,b,is_alpha,is_lasso){
   
   p=length(b(T[1],X[1,]))
   n=length(T)
-  d = ncol(Y) #  Y is a matrix [D,etc]
+  d = ncol(Y) #SS: Y is a matrix [D,etc]
   N_hat0_list <- vector("list", d)  
   # low-dimensional moments
   X0=X[,1:p0]
@@ -143,7 +143,7 @@ RMD_stable<-function(Y,T,X,p0,D_LB,D_add,max_iter,b,is_alpha,is_lasso){
       rho_hat_old=rho_hat+0
       
       # normalization
-      D_hat_rho=get_D(Y[,1],T,X,m,rho_hat_old,b) #  pick Y[,1] for the code to go thru but Y does not matter for m
+      D_hat_rho=get_D(Y[,1],T,X,m,rho_hat_old,b) #SS: pick Y[,1] for the code to go thru but Y does not matter for m
       D_hat_rho=pmax(D_LB,D_hat_rho)
       D_hat_rho=D_hat_rho+D_add
       
@@ -240,9 +240,9 @@ get_stage1<-function(Y,T,X,p0,D_LB,D_add,max_iter,b,alpha_estimator,gamma_estima
   ###########
   # gamma hat
   ###########  
-  MNG<-get_MNG(Y[,1],T,X,b) #  pick Y[,1] for the code to go thru but Y does not matter for B
+  MNG<-get_MNG(Y[,1],T,X,b) #SS: pick Y[,1] for the code to go thru but Y does not matter for B
   B=MNG[[4]]
-  d = ncol(Y) #  Y is a matrix [D,etc]
+  d = ncol(Y) #SS: Y is a matrix [D,etc]
   
   if(gamma_estimator==0){ # dantzig
     

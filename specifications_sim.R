@@ -19,15 +19,15 @@ get_sim_data<-function(N,s){
   
   outcome <- y
   takeup <- d
-  Y <- cbind(outcome, takeup) #  for LATE just need Y and participation
-  #  create a grid
+  Y <- cbind(outcome, takeup) #SS: for LATE just need Y and participation
+  #SS: create a grid
 
-  # perc <- c(-1,0,1,2,3,4) #  grid1
-  perc <- c(-2,-1,0,1,2,3) #  grid0
+  # perc <- c(-1,0,1,2,3,4) #SS: grid1
+  perc <- c(-2,-1,0,1,2,3) #SS: grid0
   
   Y <- takeup 
   for (i in 1:length(perc)) {
-    #  create n x d matrix
+    #SS: create n x d matrix
     # Y_entry <- ( outcome <= perc[i] )*takeup #grid for treated ctnr outcome grid (D, D*1{Y<=y})
     Y_entry <- ( outcome <= perc[i] )*(takeup-1) #grid for untreated ctnr outcome grid (D, (D-1)*1{Y<=y})
     Y <- cbind(Y,Y_entry)
