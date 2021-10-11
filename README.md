@@ -4,7 +4,7 @@ rrr_kappa is an R library that implements Auto-DML method to estimate complier p
 
 
 ## Usage
-For calling the Auto-DML function, load `primitives.R`, `stage1_kappa.R` and `stage2_kappa.R`.
+For calling the Auto-DML function, load `primitives.R`, `stage1_kappa.R` and `stage2_kappa.R`.  The `psi` function in `primitives.R` specifies whether we truncate the propensity scores for extreme values.
 
 For the simulations on that compare estimates by DML and kappa weighting, execute and follow in-line instructions in `main_sim_kappa.R`, that calls various function in this library.  In particular, `specifications_sim.R` varies the simulation design; `stage2_kappa_dml.R` implements both Auto-DML and DML; `naive_kappa.R` implements kappa weighting.
 
