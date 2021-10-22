@@ -1,6 +1,6 @@
 # This script contains alpha_hat_dml that plugs in estimate for pi_hat
 L=5
-
+lb <- 10^-12
 rrr<-function(Y,T,X,p0,D_LB,D_add,max_iter,b,alpha_estimator,gamma_estimator){
   
   n=nrow(X)
@@ -27,8 +27,7 @@ rrr<-function(Y,T,X,p0,D_LB,D_add,max_iter,b,alpha_estimator,gamma_estimator){
     
     n.l=length(T.l)
     n.nl=length(T.nl)
-    moments = matrix(0,n.l,d) #SS: store the Psi's for each fold
-    
+
     # get stage 1 (on nl)
     stage1_estimators<-get_stage1(Y.nl,T.nl,X.nl,p0,D_LB,D_add,max_iter,b,alpha_estimator,gamma_estimator)
     
@@ -43,13 +42,25 @@ rrr<-function(Y,T,X,p0,D_LB,D_add,max_iter,b,alpha_estimator,gamma_estimator){
     # parameter to linear function
     alpha_hat=stage1_estimators[[1]]
     
+    
+    idx <- 1:n.l; # if not trimming
+    alpha_hat_keep=rep(0,n.l)
+    for (i in 1:n.l){
+      alpha_hat_keep[i]=alpha_hat(T.l[i],X.l[i,])
+    }
+    trim_idx <- (abs(alpha_hat_keep) < (1/lb) & abs(alpha_hat_keep) > 1/(1-lb))
+    idx <- idx[trim_idx]; # if trimming
+    
+    moments = matrix(0,length(idx),d) #SS: store the Psi's for each fold
     for (dd in 1:d) {
       gamma_hat=stage1_estimators[[2]][[dd]]
       
       #get stage 2 (on l)
-      Psi=rep(0,n.l)
-      for (i in 1:n.l){
-        Psi[i]=psi(Y.l[i,dd],T.l[i],X.l[i,],m,alpha_hat,gamma_hat)
+      Psi=rep(0,length(idx))
+      j <- 1;
+      for (i in idx){
+        Psi[j]=psi(Y.l[i,dd],T.l[i],X.l[i,],m,alpha_hat,gamma_hat)
+        j <- j+1
       }
       moments[, dd] = Psi
       theta[l,dd]=mean(Psi)
@@ -60,17 +71,27 @@ rrr<-function(Y,T,X,p0,D_LB,D_add,max_iter,b,alpha_estimator,gamma_estimator){
     lasso         <-
       cv.glmnet(X.nl, T.nl, family = "binomial", alpha = 1)
     alpha_hat_dml <- function(d, z) {
-      pi_hat <- predict(lasso, newx = z,  type = "response")
+      pi_hat <- predict(lasso, newx = t(z),  type = "response")
       return((d - pi_hat) / (pi_hat * (1 - pi_hat)))
     }
-    moments_dml = matrix(0,n.l,d) #SS: store the Psi's for each fold
+    idx <- 1:n.l; # # if not trimming
+    alpha_hat_keep=rep(0,n.l)
+    for (i in 1:n.l){
+      alpha_hat_keep[i]=alpha_hat_dml(T.l[i],X.l[i,])
+    }
+    trim_idx <- (abs(alpha_hat_keep) < (1/lb) & abs(alpha_hat_keep) > 1/(1-lb))
+    idx <- idx[trim_idx]; # if trimming
+    
+    moments_dml = matrix(0,length(idx),d) #SS: store the Psi's for each fold
     for (dd in 1:d) {
       gamma_hat=stage1_estimators[[2]][[dd]]
       
       #get stage 2 (on l)
-      Psi=rep(0,n.l)
-      for (i in 1:n.l){
-        Psi[i]=psi(Y.l[i,dd],T.l[i],X.l[i,],m,alpha_hat_dml,gamma_hat)
+      Psi=rep(0,length(idx))
+      j <- 1;
+      for (i in idx){
+        Psi[j]=psi(Y.l[i,dd],T.l[i],X.l[i,],m,alpha_hat_dml,gamma_hat)
+        j <- j+1;
       }
       moments_dml[, dd] = Psi
     }
