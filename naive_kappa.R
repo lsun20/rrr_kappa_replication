@@ -9,8 +9,8 @@ naive_kappa <- function(Y, T, X) {
   pi_hat <- predict(glm(T ~ X, family = binomial), type = "response")
   
   # censor pi_hat
-  #pi_hat(pi_hat > 1 - 10^-12) = 1 - 10^-12;
-  #pi_hat(pi_hat < 10^-12) =  10^-12;
+  # pi_hat[pi_hat > 1 - 10^-12] <- 1 - 10^-12;
+  # pi_hat[pi_hat < 10^-12] <-  10^-12;
   
   alpha_hat = (T - pi_hat) / (pi_hat * (1 - pi_hat))
   
@@ -20,8 +20,8 @@ naive_kappa <- function(Y, T, X) {
   
   #create an index for trimming
   # keep = (pi_hat <= 0.9 & pi_hat >= 0.1 );
-  # keep = (pi_hat <= 1 - 10^-12 & pi_hat >= 10^-12 );
-  # moments_full <- moments_full[keep,]
+  keep = (pi_hat <= 1 - 10^-12 & pi_hat >= 10^-12 );
+  moments_full <- moments_full[keep,]
   
   j_hat <- mean(moments_full[, 1])
   theta_hat <- colMeans(moments_full[, 2:d]) / j_hat
