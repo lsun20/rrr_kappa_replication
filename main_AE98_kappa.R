@@ -38,12 +38,11 @@ df  <- read.dta("m_d_806_processed.dta")
 #df  <- read.dta("m_d_806_processed_subsample.dta")
 spec=1 #spec in (1-3) # 3 is making mlogit slow
 data<-get_data(df,spec,quintile) #trimming like Farrell; different than Chernozhukov et al. 
-# SS: need to directly edit the script 'specifications_kappa.R' to supplement grid; first column of Y is participation
+# SS: need to directly edit the script 'specifications_kappa_AE98.R' to change the covariate and instrument
 
 Y=data[[1]]
-T=data[[2]] #eligibility
+T=data[[2]] #instrument
 X=data[[3]] #no intercept
-perc=data[[4]] #grid pts
 
 ##################
 # helper functions
@@ -132,16 +131,7 @@ theta2_l <- theta2_hat - crit * V[2,2]^0.5
 theta2_u <- theta2_hat + crit * V[2,2]^0.5
 tstat <- (theta1_hat - theta2_hat)/(V[1,1]-V[1,2]-V[2,1]+V[2,2])^0.5
 
-cbind(theta1_l,theta1_u)
-cbind(theta2_l,theta2_u)
-
-
-V <- j_hat^-1 *omega_hat * j_hat^-1
-theta_hat_var = diag(V)/n
-sigma <- diag(diag(V)^-0.5 ) %*% V %*% diag(diag(V)^-0.5 )
-R <- abs(mvrnorm(10000, rep(0,length(theta_hat)), sigma))
-R_max <- apply(R, 1,FUN=max) # take row-wise max
-crit <- quantile(R_max,0.95)
-crit <- 1.96
-theta_l <- theta_hat - crit * theta_hat_var^0.5
-theta_u <- theta_hat + crit * theta_hat_var^0.5
+cbind(theta1_l,theta1_u, V[1,1]^0.5)
+cbind(theta2_l,theta2_u, V[2,2]^0.5)
+pt(tstat, df = n-1, lower.tail = T) # one-sided test p-value
+2 * pt( abs(tstat), df = n-1, lower.tail=FALSE) # two-sided test p-value
