@@ -46,16 +46,59 @@ X=data[[3]] #no intercept
 p <- dim(X)[2]
 # perc=data[[4]] #grid pts
 
+
 ##################
-# Replicate AF13
-rm(mylogit)
+# Replicate AF13 (via analytical two-step estimator asymptotics)
 mylogit <- glm(T ~ X, data = data, family = "binomial")
 n <- length(T)
 tau <- mylogit$fitted.values
 D <- Y[,1]
 kappa <- 1 - D*(1-T)/(1-tau) - (1-D)*T/tau
-theta <- t(df$ageq2nd)%*%kappa/sum(kappa)
+theta <- t(X[,1])%*%kappa/sum(kappa)
 
+Mtheta <- 2*mean(kappa)
+# Calculate standard error
+dg <- -2*(X[,1]-theta)
+
+#sigmoid function, inverse of logit
+sigmoid <- function(z){1/(1+exp(-z))}
+Fx <- sigmoid(cbind(1,X)%*%mylogit$coefficients)
+dtau <- cbind(1,X)*((((1-Fx)*Fx)%*%rep(1,5)))
+dkappa <- (as.matrix(- D*(1-T)/(1-tau)^2 + (1-D)*T/tau^2)%*%rep(1,5))*dtau
+Mgamma <- t(dkappa)%*%dg/n
+#gradient function
+grad <- function(theta, X, y){
+  
+  h <- sigmoid(X%*%theta)
+  grad <- (X*((y - h)%*%rep(1,dim(X)[2]))) 
+  grad
+}
+
+hess <- function(theta, X, y){
+  m <- length(y)
+  h <- sigmoid(X%*%theta)
+  X.h <- X*((((1-h)*h)%*%rep(1,dim(X)[2])))
+  hess <- - t(X)%*%X.h/m
+  hess
+}
+g <- grad(mylogit$coefficients,cbind(1,X),T)
+# confirm they match with standard error from coef(summary(mylogit))
+H <- hess(mylogit$coefficients,cbind(1,X),T)
+fisher_info  <- -solve(H)
+diag(fisher_info%*%(t(g)%*%g/n)%*%fisher_info)^0.5/sqrt(n) # doesn't replicate
+diag(fisher_info)^0.5/sqrt(n) # glm uses information equality
+
+
+#diag(ginv(t(g)%*%g/n))^0.5
+psi <- g%*%solve(H) # influence function for the logit coefficient estimates
+
+meat <- kappa*dg + psi%*%Mgamma
+V <- mean(meat^2)/(Mtheta^2)
+sqrt(V/n)
+
+
+##################
+# Replicate AF13 via bootstrap
 # bootstrap using parallelization
 # make a data frame
 df_subset <- as.data.frame(cbind(Y,df$multi2nd,df$samesex,X))
@@ -84,37 +127,4 @@ educm_complier <- result.boot.kappa
 ageq2nd_complier <- result.boot.kappa
 
 save(educm_complier, ageq2nd_complier, file = "complier_mean_spec0_X6_full_kappa_weight_bs.RData")
-
-Mtheta <- 2*mean(kappa)
-# Calculate standard error
-dg <- -2*(X[,1]-theta)
-
-#sigmoid function, inverse of logit
-sigmoid <- function(z){1/(1+exp(-z))}
-Fx <- sigmoid(cbind(1,X)%*%mylogit$coefficients)
-dtau <- cbind(1,X)*((((1-Fx)*Fx)%*%rep(1,5)))
-dkappa <- (as.matrix(- D*(1-T)/(1-tau)^2 + (1-D)*T/tau^2)%*%rep(1,5))*dtau
-Mgamma <- t(dkappa)%*%dg/n
-#gradient function
-grad <- function(theta, X, y){
-  
-  h <- sigmoid(X%*%theta)
-  grad <- (X*((y - h)%*%rep(1,dim(X)[2]))) 
-  grad
-}
-
-hess <- function(theta, X, y){
-  m <- length(y)
-  h <- sigmoid(X%*%theta)
-  X.h <- X*((((1-h)*h)%*%rep(1,dim(X)[2])))
-  hess <- - t(X)%*%X.h/m
-  hess
-}
-g <- grad(mylogit$coefficients,cbind(1,X),T)
-# confirm they match with vairance
-diag(ginv(t(g)%*%g/n))^0.5
-H <- hess(mylogit$coefficients,cbind(1,X),T)
-psi <- g%*%ginv(H) # influence function for the logit coefficient estimates
-
-meat <- kappa*dg + psi%*%Mgamma
-V <- mean(meat^2)/(Mtheta^2)
+ 
